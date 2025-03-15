@@ -63,8 +63,11 @@ from ultralytics.nn.modules import (
     TorchVision,
     WorldDetect,
     v10Detect,
+    PConv,
+    APC2f,
+    APBottleneck,
 )
-from ultralytics.nn.modules.APConv import APBottleneck, APC2f, PConv
+# from ultralytics.nn.modules.APConv import APBottleneck, APC2f, PConv
 from ultralytics.utils import DEFAULT_CFG_DICT, DEFAULT_CFG_KEYS, LOGGER, colorstr, emojis, yaml_load
 from ultralytics.utils.checks import check_requirements, check_suffix, check_yaml
 from ultralytics.utils.loss import (
@@ -925,7 +928,9 @@ def attempt_load_one_weight(weight, device=None, inplace=True, fuse=False):
 def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
     """Parse a YOLO model.yaml dictionary into a PyTorch model."""
     import ast
-
+    # globals().update({"PConv": PConv})
+    # globals().update({"APC2f": APC2f})
+    # print(globals())
     # Args
     legacy = True  # backward compatibility for v3/v5/v8/v9 models
     max_channels = float("inf")
@@ -983,6 +988,9 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             SCDown,
             C2fCIB,
             A2C2f,
+            PConv,
+            APC2f,
+            APBottleneck,
         }
     )
     repeat_modules = frozenset(  # modules with 'repeat' arguments

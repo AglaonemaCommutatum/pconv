@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from ultralytics.nn.modules import Bottleneck
+from ultralytics.nn.modules.block import Bottleneck
 
 def autopad(k, p=None, d=1):  # kernel, padding, dilation
     """Pad to 'same' shape outputs."""
@@ -36,7 +36,7 @@ class Conv(nn.Module):
 class PConv(nn.Module):  
     ''' Pinwheel-shaped Convolution using the Asymmetric Padding method. '''
     
-    def __init__(self, c1, c2, k=3, s=1):
+    def __init__(self, c1, c2, k, s=1):
         super().__init__()
 
         # self.k = k
