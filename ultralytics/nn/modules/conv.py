@@ -233,25 +233,44 @@ class DWConvTranspose2d(nn.ConvTranspose2d):
 class PConv(nn.Module):
     ''' Pinwheel-shaped Convolution using the Asymmetric Padding method. '''
 
-    def __init__(self, c1, c2, k=3, s=1):
+    def __init__(self, c1, c2, k, s=1):
+        """
+        Initialize the PConv layer with given parameters.
+
+        Args:
+            c1 (int): Number of input channels.
+            c2 (int): Number of output channels.
+            k (int): Kernel size.
+            s (int): Stride.
+        """
         super().__init__()
 
-        # self.k = k
+        # Define asymmetric padding for each direction
         p = [(k, 0, 1, 0), (0, k, 0, 1), (0, 1, k, 0), (1, 0, 0, k)]
         self.pad = [nn.ZeroPad2d(padding=(p[g])) for g in range(4)]
+
+        # Define convolution layers for width and height
         self.cw = Conv(c1, c2 // 4, (1, k), s=s, p=0)
         self.ch = Conv(c1, c2 // 4, (k, 1), s=s, p=0)
+
+        # Define concatenation convolution layer
         self.cat = Conv(c2, c2, 2, s=1, p=0)
 
     def forward(self, x):
+        """
+        Forward pass for the PConv layer.
+
+        Args:
+            x (torch.Tensor): Input tensor.
+
+        Returns:
+            torch.Tensor: Output tensor after applying pinwheel-shaped convolution.
+        """
         yw0 = self.cw(self.pad[0](x))
         yw1 = self.cw(self.pad[1](x))
         yh0 = self.ch(self.pad[2](x))
         yh1 = self.ch(self.pad[3](x))
         return self.cat(torch.cat([yw0, yw1, yh0, yh1], dim=1))
-
-
-
 class ConvTranspose(nn.Module):
     """
     Convolution transpose module with optional batch normalization and activation.
